@@ -19,7 +19,7 @@ body{
     margin: auto;
     width: 640px;
     height: 400px;
-    margin-top: 200px;
+    margin-top: 100px;
     background-color: rgb(185, 195, 195);
 }
 .widebox{           /* 100x640 */
@@ -29,7 +29,7 @@ body{
     height: 200px;
     background-color: aquamarine;
 }
-.tinybox, .tinyboxbtn{           /* 100x128 */
+.tinybox, #numberbuttons button{           /* 100x128 */
     font-size: 70px;
     margin: 4px;
     float: left;
@@ -42,6 +42,16 @@ body{
 .tinybox{
     background-color: whitesmoke;
 }
+.widebtn{
+        font-size: 70px;
+    margin: 4px;
+    float: left;
+    background-color: rgb(214, 207, 197);
+    width: 312px;
+    height: 194px;
+    border-radius: 30px;
+    border: 0;
+}
 .widebox, .tinybox{
     text-align: center;
     border-radius: 32px;
@@ -51,34 +61,117 @@ button:hover{
     opacity: 0.5;
     cursor: pointer;
 }
+button:active{
+    background-color: aquamarine;
+    cursor: pointer;
+}
+#debug{
+    font-size: 60px;
+    position: absolute;
+}
         </style>
     </head>
     <body>
+        <div id="debug"></div>
 <div id="container">
     <div class="smallcontainer">
-        <div class="widebox">888</div>
-        <div class="tinybox">3</div>
-        <div class="tinybox">14</div>
-        <div class="tinybox">43</div>
-        <div class="tinybox">6</div>
-        <div class="tinybox">23</div>
+        <div class="widebox" id="wantedno"></div>
+        <div class="tinybox" id="slot1">_</div>
+        <div class="tinybox" id="slot2">_</div>
+        <div class="tinybox" id="slot3">_</div>
+        <div class="tinybox" id="slot4">_</div>
+        <div class="tinybox" id="slot5">_</div>
+    </div>
+    <div class="smallcontainer" id="numberbuttons">
+        <button class="tinyboxbtn" onclick="add('+')">+</button>
+        <button class="tinyboxbtn" onclick="add('-')">-</button>
+        <button class="tinyboxbtn" onclick="add('*')">x</button>
+        <button class="tinyboxbtn" onclick="add('/')">/</button>
+        <button class="tinyboxbtn" onclick=""></button>
     </div>
     <div class="smallcontainer">
-        <button class="tinyboxbtn">+</button>
-        <button class="tinyboxbtn">-</button>
-        <button class="tinyboxbtn">x</button>
-        <button class="tinyboxbtn">/</button>
-        <button class="tinyboxbtn"></button>
-        <button class="tinyboxbtn">3</button>
-        <button class="tinyboxbtn">14</button>
-        <button class="tinyboxbtn">43</button>
-        <button class="tinyboxbtn">6</button>
-        <button class="tinyboxbtn">23</button>
+        <button class="widebtn" onclick="add('submit')">SUBMIT</button>
+        <button class="widebtn" onclick="">Add Text</button>
+        <button class="widebtn" onclick="">Add Text</button>
+        <button class="widebtn" onclick="">Add Text</button>
+    </div>
     </div>
 </div>
 
         <script>
+let itemCount = 0;
+let equationLine = [];
+let symbolsArray = ["+","x","-","/"];
+let createNumbers=()=>{
+    let num1 = Math.floor(Math.random() * 4 + 2);
+    let num2 = Math.floor(Math.random() * 4 + 6);
+    let num3 = Math.floor(Math.random() * 6 + 10);
+    let num4 = Math.floor(Math.random() * 10 + 16);
+    let num5 = Math.floor(Math.random() * 25 + 26);
+    let wNum = Math.floor(Math.random() * 100 + 75);
+    wantedno.innerHTML = wNum
+    return [num1, num2, num3, num4, num5]
+}
+let buildEquation=()=>{
 
+}
+let numbersArray = createNumbers()
+numbersArray = numbersArray.sort( () => Math.random()-0.5 );
+for(let i = 0; i < 5; i++){
+
+    let newElement = document.createElement("button")
+    newElement.innerHTML=numbersArray[i]
+    newElement.setAttribute("onclick", `add(${i})`)
+    document.getElementById("numberbuttons").appendChild(newElement)
+    
+}
+let add=(value)=>{
+    if(value != "submit"){
+        if(!isNaN(value)){
+            if(itemCount % 2 == 0 && itemCount < 5){
+                equationLine.push(numbersArray[value])
+                itemCount++
+                updateScreen(itemCount, value)
+            }
+        }
+        else{
+            if(itemCount % 2 == 1 && itemCount < 5){
+                equationLine.push(value)
+                itemCount++
+                updateScreen(itemCount, value)
+            }
+        }
+    }
+    else if (itemCount == 5){
+    debug.innerHTML = `item count = ${itemCount}, equation line = ${equationLine}, eq li text = ${eval(equationLine.join(""))}`
+    }
+
+
+}
+let updateScreen=(count, char)=>{
+    switch(count){
+        case 1:
+            slot1.innerHTML = numbersArray[char]
+            slot1.style.opacity="0.7"
+            break;
+        case 2:
+            slot2.innerHTML = char
+            slot2.style.opacity="0.7"
+            break;
+        case 3:
+            slot3.innerHTML = numbersArray[char]
+            slot3.style.opacity="0.7"
+            break;
+        case 4:
+            slot4.innerHTML = char
+            slot4.style.opacity="0.7"
+            break;
+        case 5:
+            slot5.innerHTML = numbersArray[char]
+            slot5.style.opacity="0.7"
+            break;
+    }
+}
         </script>
     </body>
 </html>
