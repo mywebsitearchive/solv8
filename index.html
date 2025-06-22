@@ -9,10 +9,11 @@ body{
     touch-action: manipulation;
 }
 #container{
+    user-select: none;
     overflow: auto;
     margin: auto;
     width: 800px;
-    height: 1500px;
+    height: 1700px;
     background-color: antiquewhite;
 }
 .smallcontainer{    /* 400x640 */
@@ -22,12 +23,20 @@ body{
     margin-top: 100px;
     background-color: rgb(185, 195, 195);
 }
-.widebox{           /* 100x640 */
+.widebox, #youwinscreen{           /* 100x640 */
     font-size: 100px;
     float: left;
-    width: 640px;
+    width: 320px;
     height: 200px;
     background-color: aquamarine;
+}
+#youwinscreen{
+    width: 640px;
+    height: 200px;
+    display: none;
+}
+#youwinscreen p{
+    font-size: 100px;
 }
 .tinybox, #numberbuttons button{           /* 100x128 */
     font-size: 70px;
@@ -43,7 +52,7 @@ body{
     background-color: whitesmoke;
 }
 .widebtn{
-        font-size: 70px;
+    font-size: 70px;
     margin: 4px;
     float: left;
     background-color: rgb(214, 207, 197);
@@ -52,7 +61,7 @@ body{
     border-radius: 30px;
     border: 0;
 }
-.widebox, .tinybox{
+.widebox, .tinybox, #youwinscreen{
     text-align: center;
     border-radius: 32px;
     line-height: 200px;
@@ -69,12 +78,23 @@ button:active{
     font-size: 60px;
     position: absolute;
 }
+#infobar{
+    height: 100px;
+    background-color: bisque;
+    margin-top: 100px;
+    text-align: center;
+    font-size: 50px;
+    line-height: 100px;
+}
         </style>
     </head>
     <body>
         <div id="debug"></div>
 <div id="container">
+
     <div class="smallcontainer">
+        <div id="youwinscreen">You Win</div>
+        <div class="widebox" id="resultscreen"></div>
         <div class="widebox" id="wantedno"></div>
         <div class="tinybox" id="slot1">_</div>
         <div class="tinybox" id="slot2">_</div>
@@ -82,16 +102,17 @@ button:active{
         <div class="tinybox" id="slot4">_</div>
         <div class="tinybox" id="slot5">_</div>
     </div>
+    <div id="infobar"></div>
     <div class="smallcontainer" id="numberbuttons">
         <button class="tinyboxbtn" onclick="add('+')">+</button>
         <button class="tinyboxbtn" onclick="add('-')">-</button>
         <button class="tinyboxbtn" onclick="add('*')">x</button>
         <button class="tinyboxbtn" onclick="add('/')">/</button>
-        <button class="tinyboxbtn" onclick=""></button>
+        <button class="tinyboxbtn" onclick="backspace()">⌫</button>
     </div>
-    <div class="smallcontainer">
+    <div class="smallcontainer" id="otherbuttons">
         <button class="widebtn" onclick="add('submit')">SUBMIT</button>
-        <button class="widebtn" onclick="">Add Text</button>
+        <button class="widebtn" onclick="showDebug()">debug</button>
         <button class="widebtn" onclick="">Add Text</button>
         <button class="widebtn" onclick="">Add Text</button>
     </div>
@@ -101,30 +122,53 @@ button:active{
         <script>
 let itemCount = 0;
 let equationLine = [];
-let symbolsArray = ["+","x","-","/"];
+let numbersArray = [];
+let usedIndices = [];
+let lastInput;
+let result;
+let num1;
+let num2;
+let num3;
+let num4;
+let num5;
+let wNum;
+let attempts = 1;
+let i = 0;
+let newElement;
+let begin = true
 let createNumbers=()=>{
-    let num1 = Math.floor(Math.random() * 4 + 2);
-    let num2 = Math.floor(Math.random() * 4 + 6);
-    let num3 = Math.floor(Math.random() * 6 + 10);
-    let num4 = Math.floor(Math.random() * 10 + 16);
-    let num5 = Math.floor(Math.random() * 25 + 26);
-    let wNum = Math.floor(Math.random() * 100 + 75);
-    wantedno.innerHTML = wNum
-    return [num1, num2, num3, num4, num5]
-}
-let buildEquation=()=>{
+    numberbuttons.innerHTML = `
+        <button class="tinyboxbtn" onclick="add('+')">+</button>
+        <button class="tinyboxbtn" onclick="add('-')">-</button>
+        <button class="tinyboxbtn" onclick="add('*')">x</button>
+        <button class="tinyboxbtn" onclick="add('/')">/</button>
+        <button class="tinyboxbtn" onclick="backspace()">⌫</button>
+        `
+    num1 = Math.floor(Math.random() * 4 + 2);   // 2 - 5
+    num2 = Math.floor(Math.random() * 4 + 6);   // 6 - 9
+    num3 = Math.floor(Math.random() * 6 + 10);  // 10-15
+    num4 = Math.floor(Math.random() * 10 + 16); // 16-25
+    num5 = Math.floor(Math.random() * 25 + 26); // 26-50
+
+    if(begin){
+        wNum = Math.floor(Math.random() * 40 + 60); // 60-99
+        wantedno.innerHTML = wNum
+        }
+
+    numbersArray = [num1, num2, num3, num4, num5]
+
+    numbersArray = numbersArray.sort( () => Math.random()-0.5 );
+    for(i = 0; i < 5; i++){
+        newElement = document.createElement("button")
+        newElement.innerHTML=numbersArray[i]
+        newElement.setAttribute("onclick", `add(${i})`)
+        newElement.setAttribute("id", `num${i}element`)
+        numberbuttons.appendChild(newElement)
+    }
+    begin= false
 
 }
-let numbersArray = createNumbers()
-numbersArray = numbersArray.sort( () => Math.random()-0.5 );
-for(let i = 0; i < 5; i++){
 
-    let newElement = document.createElement("button")
-    newElement.innerHTML=numbersArray[i]
-    newElement.setAttribute("onclick", `add(${i})`)
-    document.getElementById("numberbuttons").appendChild(newElement)
-    
-}
 let add=(value)=>{
     if(value != "submit"){
         if(!isNaN(value)){
@@ -142,11 +186,118 @@ let add=(value)=>{
             }
         }
     }
-    else if (itemCount == 5){
-    debug.innerHTML = `item count = ${itemCount}, equation line = ${equationLine}, eq li text = ${eval(equationLine.join(""))}`
+    else if (itemCount%2 == 1){ // submit
+        result = eval(equationLine.join("")).toFixed(2)
+        if(result > 299){
+            result = 299
+        }
+        if(result < 0){
+            result = 0
+        }
+        resultscreen.innerHTML = result
+        result = Math.floor(Number(result)+0.5)
+        // debug.innerHTML = `item count = ${itemCount}, equation line = ${equationLine}, result = ${result}`
+        itemCount++
+
+        if(result == wNum){
+            winGame();
+        }
+        else{
+            slot1.innerHTML = result
+            slot2.innerHTML = "_"
+            slot3.innerHTML = "_"
+            slot4.innerHTML = "_"
+            slot5.innerHTML = "_"
+            slot2.style.backgroundColor = "white"
+            slot3.style.backgroundColor = "white"
+            slot4.style.backgroundColor = "white"
+            slot5.style.backgroundColor = "white"
+            num0element.style.backgroundColor = "rgb(214, 207, 197)"
+            num1element.style.backgroundColor = "rgb(214, 207, 197)"
+            num2element.style.backgroundColor = "rgb(214, 207, 197)"
+            num3element.style.backgroundColor = "rgb(214, 207, 197)"
+            num4element.style.backgroundColor = "rgb(214, 207, 197)"
+            num0element.disabled = false
+            num1element.disabled = false
+            num2element.disabled = false
+            num3element.disabled = false
+            num4element.disabled = false
+            equationLine = [result]
+            itemCount = 1
+            createNumbers()
+            infobar.innerHTML = `Attempts: ${attempts} | Goal: ${wNum}`
+            attempts++;
+        }
+}
+
+}
+let backspace=()=>{
+    lastInput = usedIndices[usedIndices.length-1]
+    debug.innerHTML = `last input = ${lastInput}`
+    if(itemCount > 1 || begin){
+        switch(lastInput){
+            case 0:
+                num0element.disabled = false
+                num0element.style.backgroundColor = "rgb(214, 207, 197)"
+                usedIndices.pop()
+                break;
+            case 1:
+                num1element.disabled = false
+                num1element.style.backgroundColor = "rgb(214, 207, 197)"
+                usedIndices.pop()
+                break;
+            case 2:
+                num2element.disabled = false
+                num2element.style.backgroundColor = "rgb(214, 207, 197)"
+                usedIndices.pop()
+                break;
+            case 3:
+                num3element.disabled = false
+                num3element.style.backgroundColor = "rgb(214, 207, 197)"
+                usedIndices.pop()
+                break;
+            case 4:
+                num4element.disabled = false
+                num4element.style.backgroundColor = "rgb(214, 207, 197)"
+                usedIndices.pop()
+                break;
+            default:
+                usedIndices.pop()
     }
-
-
+            switch(itemCount){
+                case 1:
+                    slot1.innerHTML = "_"
+                    slot1.style.opacity="1"
+                    equationLine.pop()
+                    itemCount--
+                    break;
+                case 2:
+                    slot2.innerHTML = "_"
+                    slot2.style.opacity="1"
+                    equationLine.pop()
+                    itemCount--
+                    break;
+                case 3:
+                    slot3.innerHTML = "_"
+                    slot3.style.opacity="1"
+                    equationLine.pop()
+                    itemCount--
+                    break;
+                case 4:
+                    slot4.innerHTML = "_"
+                    slot4.style.opacity="1"
+                    equationLine.pop()
+                    itemCount--
+                    break;
+                case 5:
+                    slot5.innerHTML = "_"
+                    slot5.style.opacity="1"
+                    equationLine.pop()
+                    itemCount--
+                    break;
+            }
+            }
+    
 }
 let updateScreen=(count, char)=>{
     switch(count){
@@ -171,7 +322,52 @@ let updateScreen=(count, char)=>{
             slot5.style.opacity="0.7"
             break;
     }
+    switch(char){
+        case 0:
+            usedIndices.push(char)
+            num0element.disabled = "true"
+            num0element.style.backgroundColor = "gray"
+            break;
+        case 1:
+            usedIndices.push(char)
+            num1element.disabled = "true"
+            num1element.style.backgroundColor = "gray"
+            break;
+        case 2:
+            usedIndices.push(char)
+            num2element.disabled = "true"
+            num2element.style.backgroundColor = "gray"
+            break;
+        case 3:
+            usedIndices.push(char)
+            num3element.disabled = "true"
+            num3element.style.backgroundColor = "gray"
+            break;
+        case 4:
+            usedIndices.push(char)
+            num4element.disabled = "true"
+            num4element.style.backgroundColor = "gray"
+            break;
+        default:
+            usedIndices.push(char)
+    }
 }
-        </script>
+let showDebug=()=>{
+    debug.innerHTML= `
+    numbersArray: ${numbersArray}<br>
+    itemCount: ${itemCount}<br>
+    used indices: ${usedIndices}<br>
+    last input: ${lastInput}<br>
+    equation line: ${equationLine}<br>`
+}
+let winGame=()=>{
+    resultscreen.style.display="none"
+    wantedno.style.display="none"
+    numberbuttons.style.display="none"
+    otherbuttons.style.display="none"
+    youwinscreen.style.display = "block"
+}
+createNumbers()
+</script>
     </body>
 </html>
