@@ -9,7 +9,6 @@ body{
     touch-action: manipulation;
 }
 #container{
-    user-select: none;
     overflow: auto;
     margin: auto;
     width: 800px;
@@ -200,6 +199,7 @@ let add=(value)=>{
         itemCount++
 
         if(result == wNum){
+
             winGame();
         }
         else{
@@ -225,8 +225,8 @@ let add=(value)=>{
             equationLine = [result]
             itemCount = 1
             createNumbers()
-            infobar.innerHTML = `Attempts: ${attempts} | Goal: ${wNum}`
             attempts++;
+            infobar.innerHTML = `Attempt: ${attempts} | Goal: ${wNum}`
         }
 }
 
@@ -361,6 +361,9 @@ let showDebug=()=>{
     equation line: ${equationLine}<br>`
 }
 let winGame=()=>{
+                if(attempts == 1){
+                infobar.innerHTML = `Single attempt! | Goal: ${wNum}`
+            }
     resultscreen.style.display="none"
     wantedno.style.display="none"
     numberbuttons.style.display="none"
