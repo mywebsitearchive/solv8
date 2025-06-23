@@ -37,7 +37,7 @@ body{
 #youwinscreen p{
     font-size: 100px;
 }
-.tinybox, #numberbuttons button{           /* 100x128 */
+.tinybox, #numberbuttons button, #playagainbutton{           /* 100x128 */
     font-size: 70px;
     margin: 4px;
     float: left;
@@ -46,6 +46,12 @@ body{
     height: 194px;
     border-radius: 30px;
     border: 0;
+}
+#playagainbutton{
+    margin-top: 100px;
+    width: 500px;
+    margin-left: 150px;
+    display: none;
 }
 .tinybox{
     background-color: whitesmoke;
@@ -102,6 +108,7 @@ button:active{
         <div class="tinybox" id="slot5">_</div>
     </div>
     <div id="infobar"></div>
+    <button id="playagainbutton" onclick="playAgain()">Play Again</button>
     <div class="smallcontainer" id="numberbuttons">
         <button class="tinyboxbtn" onclick="add('+')">+</button>
         <button class="tinyboxbtn" onclick="add('-')">-</button>
@@ -164,7 +171,6 @@ let createNumbers=()=>{
         newElement.setAttribute("id", `num${i}element`)
         numberbuttons.appendChild(newElement)
     }
-    begin= false
 
 }
 
@@ -203,6 +209,7 @@ let add=(value)=>{
             winGame();
         }
         else{
+            begin= false
             slot1.innerHTML = result
             slot2.innerHTML = "_"
             slot3.innerHTML = "_"
@@ -264,7 +271,7 @@ let backspace=()=>{
             default:
                 usedIndices.pop()
     }
-            switch(itemCount){
+        switch(itemCount){
                 case 1:
                     slot1.innerHTML = "_"
                     slot1.style.opacity="1"
@@ -358,7 +365,9 @@ let showDebug=()=>{
     itemCount: ${itemCount}<br>
     used indices: ${usedIndices}<br>
     last input: ${lastInput}<br>
-    equation line: ${equationLine}<br>`
+    equation line: ${equationLine}<br>
+    attempts: ${attempts}<br>
+    beginnning: ${begin}<br>`
 }
 let winGame=()=>{
                 if(attempts == 1){
@@ -368,9 +377,45 @@ let winGame=()=>{
     wantedno.style.display="none"
     numberbuttons.style.display="none"
     otherbuttons.style.display="none"
+    playagainbutton.style.display="block"
     youwinscreen.style.display = "block"
 }
+let playAgain=()=>{
+    infobar.innerHTML = ``
+    resultscreen.style.display="block"
+    wantedno.style.display="block"
+    numberbuttons.style.display="block"
+    otherbuttons.style.display="block"
+    youwinscreen.style.display = "none"
+    playagainbutton.style.display="none"
+
+    slot1.innerHTML = "_"
+    slot2.innerHTML = "_"
+    slot3.innerHTML = "_"
+    slot4.innerHTML = "_"
+    slot5.innerHTML = "_"
+    slot2.style.backgroundColor = "white"
+    slot3.style.backgroundColor = "white"
+    slot4.style.backgroundColor = "white"
+    slot5.style.backgroundColor = "white"
+    num0element.style.backgroundColor = "rgb(214, 207, 197)"
+    num1element.style.backgroundColor = "rgb(214, 207, 197)"
+    num2element.style.backgroundColor = "rgb(214, 207, 197)"
+    num3element.style.backgroundColor = "rgb(214, 207, 197)"
+    num4element.style.backgroundColor = "rgb(214, 207, 197)"
+    num0element.disabled = false
+    num1element.disabled = false
+    num2element.disabled = false
+    num3element.disabled = false
+    num4element.disabled = false
+    equationLine = []
+    itemCount = 0
+    attempts = 1;
+    begin = true;
+    createNumbers()
+}
 createNumbers()
+winGame()
 </script>
     </body>
 </html>
