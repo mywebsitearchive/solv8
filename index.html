@@ -107,7 +107,7 @@ button:active{
         <div class="tinybox" id="slot4">_</div>
         <div class="tinybox" id="slot5">_</div>
     </div>
-    <div id="infobar"></div>
+    <div id="infobar">Select one of the numbers to start</div>
     <button id="playagainbutton" onclick="playAgain()">Play Again</button>
     <div class="smallcontainer" id="numberbuttons">
         <button class="tinyboxbtn" onclick="add('+')">+</button>
@@ -240,7 +240,7 @@ let add=(value)=>{
 }
 let backspace=()=>{
     lastInput = usedIndices[usedIndices.length-1]
-    debug.innerHTML = `last input = ${lastInput}`
+    // debug.innerHTML = `last input = ${lastInput}`
     if(itemCount > 1 || begin){
         switch(lastInput){
             case 0:
@@ -388,7 +388,8 @@ let playAgain=()=>{
     otherbuttons.style.display="block"
     youwinscreen.style.display = "none"
     playagainbutton.style.display="none"
-
+    resultscreen.innerHTML = ""
+    infobar.innerHTML = "Select one of the numbers to start"
     slot1.innerHTML = "_"
     slot2.innerHTML = "_"
     slot3.innerHTML = "_"
@@ -415,7 +416,6 @@ let playAgain=()=>{
     createNumbers()
 }
 createNumbers()
-winGame()
 </script>
     </body>
 </html>
