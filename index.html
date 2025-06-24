@@ -80,6 +80,7 @@ button:active{
     cursor: pointer;
 }
 #debug{
+    left: 1000px;
     font-size: 60px;
     position: absolute;
 }
@@ -91,10 +92,81 @@ button:active{
     font-size: 50px;
     line-height: 100px;
 }
+#hamburger{
+    top: 30px;
+    left: 10px;
+    font-size: 100px;
+    vertical-align: top;
+    padding: 0;
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    text-align: center;
+    border-radius: 75px;
+    border: 5px solid black;
+    z-index: 3;
+}
+#menu{
+    display: none;
+    position: absolute;
+    width: 500px;
+    height: 1500px;
+    background-color: rgb(246, 241, 241);
+    z-index: 2;
+    padding-left: 200px;
+    font-size: 70px;
+}
+#menu p{
+    float: left;
+    height: 90px;
+    width: 460px;
+    text-align: center;
+    margin: 20px;
+}
+#menu select{
+    float: left;
+    height: 90px;
+    width: 460px;
+    text-align: center;
+    font-size: 70px;
+    padding: 0;
+    margin: 20px;
+    border: 5px solid black;
+}
+#difficultyscreen{
+    top: 25px;
+    font-size: 50px;
+    text-align: center;
+    position: absolute;
+    width: 100%;
+}
+#invisiblebutton{
+    display: none;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 1;
+    opacity: 0;
+    overflow: hidden;
+}
         </style>
     </head>
     <body>
         <div id="debug"></div>
+        <button id="hamburger" onclick="showMenu()">≡</button>
+        <div id="menu">
+            <p>Difficulty:</p>
+            <select onchange="chooseMode()" id="myselect">
+                <optgroup>
+                    <option>Easy</option>
+                    <option selected>Normal</option>
+                    <option>Hard</option>
+                    <option>Extreme</option>
+                </optgroup>
+            </select>
+        </div>
+        <button id="invisiblebutton" onclick="showMenu()"></button>
+        <div id="difficultyscreen">Difficulty: Normal</div>
 <div id="container">
 
     <div class="smallcontainer">
@@ -132,16 +204,21 @@ let numbersArray = [];
 let usedIndices = [];
 let lastInput;
 let result;
+let attempts = 1;
+let i = 0;
+let newElement;
+let gamemode = 1;
+let begin = true
+let menuopen = false
 let num1;
 let num2;
 let num3;
 let num4;
 let num5;
 let wNum;
-let attempts = 1;
-let i = 0;
-let newElement;
-let begin = true
+let sizeFactor = 1
+
+
 let createNumbers=()=>{
     numberbuttons.innerHTML = `
         <button class="tinyboxbtn" onclick="add('+')">+</button>
@@ -150,27 +227,68 @@ let createNumbers=()=>{
         <button class="tinyboxbtn" onclick="add('/')">/</button>
         <button class="tinyboxbtn" onclick="backspace()">⌫</button>
         `
-    num1 = Math.floor(Math.random() * 4 + 2);   // 2 - 5
-    num2 = Math.floor(Math.random() * 4 + 6);   // 6 - 9
-    num3 = Math.floor(Math.random() * 6 + 10);  // 10-15
-    num4 = Math.floor(Math.random() * 10 + 16); // 16-25
-    num5 = Math.floor(Math.random() * 25 + 26); // 26-50
-
-    if(begin){
-        wNum = Math.floor(Math.random() * 40 + 60); // 60-99
-        wantedno.innerHTML = wNum
+    switch(gamemode){ //gamemode used in add() too
+        case 0:
+            difficultyscreen.innerHTML = "Difficulty: Easy"
+            num1 = Math.floor(Math.random() * (3-1+1) + 1);             // 1 - 3
+            num2 = Math.floor(Math.random() * (3-1+1) + 1);             // 1 - 3
+            num3 = Math.floor(Math.random() * (9-4+1) + 4);             // 4 - 9
+            num4 = Math.floor(Math.random() * (9-4+1) + 4);             // 4 - 9
+            num5 = Math.floor(Math.random() * (15-10+1) + 10);          // 10-15
+            if(begin){
+                wNum = Math.floor(Math.random() * (20-16+1) + 16);      // 16-20
+            }
+            break;
+        case 1:
+            difficultyscreen.innerHTML = "Difficulty: Normal"
+            num1 = Math.floor(Math.random() * (5-2+1) + 2);             // 2 - 5
+            num2 = Math.floor(Math.random() * (9-6+1) + 6);             // 6 - 9
+            num3 = Math.floor(Math.random() * (15-10+1) + 10);          // 10-15
+            num4 = Math.floor(Math.random() * (25-16+1) + 16);          // 16-25
+            num5 = Math.floor(Math.random() * (50-26+1) + 26);          // 26-50
+            if(begin){
+                wNum = Math.floor(Math.random() * (99-60+1) + 60);      // 60-99
+            }
+            break;
+        case 2:
+            difficultyscreen.innerHTML = "Difficulty: Hard"
+            num1 = Math.floor(Math.random() * (10-2+1) + 2);            // 2 -10
+            num2 = Math.floor(Math.random() * (20-11+1) + 11);          // 11-20
+            num3 = Math.floor(Math.random() * (40-21+1) + 21);          // 21-40
+            num4 = Math.floor(Math.random() * (70-41+1) + 41);          // 41-70
+            num5 = Math.floor(Math.random() * (99-70+1) + 70);          // 70-99
+            if(begin){
+                wNum = Math.floor(Math.random() * (99-60+1) + 60);      // 60-99
+            }
+            break;
+        case 3:
+            difficultyscreen.innerHTML = "Difficulty: Extreme"
+            num1 = Math.floor(Math.random() * (100-51+1) + 51);         // 51-100
+            num2 = Math.floor(Math.random() * (150-101+1) + 101);       // 101-150
+            num3 = Math.floor(Math.random() * (200-151+1) + 151);       // 151-200
+            num4 = Math.floor(Math.random() * (300-201+1) + 201);       // 201-300
+            num5 = Math.floor(Math.random() * (400-301+1) + 301);       // 301-400
+            if(begin){
+                wNum = Math.floor(Math.random() * (800-600+1) + 600);   // 600-800
+            }
+            break;
         }
-
-    numbersArray = [num1, num2, num3, num4, num5]
-
-    numbersArray = numbersArray.sort( () => Math.random()-0.5 );
-    for(i = 0; i < 5; i++){
-        newElement = document.createElement("button")
-        newElement.innerHTML=numbersArray[i]
-        newElement.setAttribute("onclick", `add(${i})`)
-        newElement.setAttribute("id", `num${i}element`)
-        numberbuttons.appendChild(newElement)
-    }
+        
+        
+        numbersArray = []
+        
+        numbersArray = [num1, num2, num3, num4, num5]
+        wantedno.innerHTML = wNum
+        
+        numbersArray = numbersArray.sort( () => Math.random()-0.5 );
+        for(i = 0; i < 5; i++){
+            newElement = document.createElement("button")
+            newElement.innerHTML=numbersArray[i]
+            newElement.setAttribute("onclick", `add(${i})`)
+            newElement.setAttribute("id", `num${i}element`)
+            numberbuttons.appendChild(newElement)
+        }
+        changeFontSize();
 
 }
 
@@ -193,9 +311,15 @@ let add=(value)=>{
     }
     else if (itemCount%2 == 1){ // submit
         result = eval(equationLine.join("")).toFixed(2)
-        if(result > 299){
-            result = 299
-        }
+
+        switch(gamemode){ 
+            case 1:
+                if(result > 299){
+                    result = 299
+                }
+                break;
+            }
+            
         if(result < 0){
             result = 0
         }
@@ -414,6 +538,46 @@ let playAgain=()=>{
     attempts = 1;
     begin = true;
     createNumbers()
+}
+let showMenu=()=>{
+    begin = true;
+    if(menuopen){
+        menuopen = false
+        hamburger.innerHTML = "≡"
+        container.style.filter = "none";
+        menu.style.display = "none"
+        invisiblebutton.style.display = "none"
+    }
+    else{
+        menuopen = true
+        hamburger.innerHTML = "✕"
+        container.style.filter = "blur(10px)";
+        invisiblebutton.style.display = "block"
+        menu.style.display = "block"
+    }
+    createNumbers()
+}
+let chooseMode=()=>{
+    gamemode = myselect.selectedIndex
+}
+let changeFontSize=()=>{
+    if(gamemode > 1){
+        sizeFactor = 0.7
+    }
+    else{
+        sizeFactor = 1
+    }
+
+    num0element.style.fontSize = sizeFactor*70 + "px";
+    num1element.style.fontSize = sizeFactor*70 + "px";
+    num2element.style.fontSize = sizeFactor*70 + "px";
+    num3element.style.fontSize = sizeFactor*70 + "px";
+    num4element.style.fontSize = sizeFactor*70 + "px";
+    slot1.style.fontSize = sizeFactor*70 + "px";
+    slot2.style.fontSize = sizeFactor*70 + "px";
+    slot3.style.fontSize = sizeFactor*70 + "px";
+    slot4.style.fontSize = sizeFactor*70 + "px";
+    slot5.style.fontSize = sizeFactor*70 + "px";
 }
 createNumbers()
 </script>
