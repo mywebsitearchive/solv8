@@ -325,7 +325,7 @@ let add=(value)=>{
     }
     else if (itemCount%2 == 1){ // submit
         result = eval(equationLine.join("")).toFixed(2)
-        resultText += `${equationLine.join(" ")} = ${Number(result).toFixed(0)}<br>`
+        resultText += `${equationLine.join(" ")} ≈ ${Number(result).toFixed(0)}<br>`
 
         switch(gamemode){ 
             case 0:
@@ -539,6 +539,7 @@ let winGame=()=>{
             
 }
 let playAgain=()=>{
+    resultText = ""
     infobar.innerHTML = ``
     resultscreen.style.display="block"
     wantedno.style.display="block"
@@ -595,7 +596,7 @@ let showMenu=()=>{
 }
 let chooseMode=()=>{
     gamemode = myselect.selectedIndex
-    createNumbers()
+    playAgain()
 }
 let changeFontSize=()=>{
     if(gamemode > 1){
