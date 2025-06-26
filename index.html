@@ -178,7 +178,7 @@ button:active{
             </select>
         </div>
         <button id="invisiblebutton" onclick="showMenu()"></button>
-        <div id="difficultyscreen">Difficulty: Normal</div>
+        <div id="difficultyscreen"></div>
 <div id="container">
 
     <div class="smallcontainer">
@@ -537,8 +537,9 @@ let winGame=()=>{
             Difficulty: ${difficultyText}<br>
             ${resultText}`
             
-}
+        }
 let playAgain=()=>{
+    createNumbers()
     resultText = ""
     infobar.innerHTML = ``
     resultscreen.style.display="block"
@@ -574,7 +575,6 @@ let playAgain=()=>{
     itemCount = 0
     attempts = 1;
     begin = true;
-    createNumbers()
 }
 let showMenu=()=>{
     begin = true;
@@ -595,6 +595,7 @@ let showMenu=()=>{
 
 }
 let chooseMode=()=>{
+    
     gamemode = myselect.selectedIndex
     playAgain()
 }
@@ -621,7 +622,7 @@ let copyToClipboard=()=>{
     navigator.clipboard.writeText(copyableresult.innerHTML.replace("Results (click to copy):", "").replaceAll("<br>", "\n").trim().replaceAll("            ", ""))
     copyableresult.innerHTML = "Text copied!"
 }
-createNumbers()
+chooseMode()
 </script>
     </body>
 </html>
